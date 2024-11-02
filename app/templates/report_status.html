@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Admin Reports Management
+{% endblock title %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+            <h1 class="display-4 mb-4">Check Filed Reports</h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        <div class="col-md-10">
+            {% for report in user_reports %}
+            <!-- Report Card -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4>Report ID: {{ report.id }}</h4>
+                            <h5 class="card-title">{{ report.title }}</h5>
+                            <p class="card-text">location: {{report.location}}</p>
+                            {% if report.file_image %}
+                            <img src="{{ report.file_image.url }}" alt="Report Image" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-right d-flex flex-column justify-content-between">
+                            <div>
+                                <h5>Status: 
+                                    <span class="{% if report.status == 'Completed' %}text-success{% elif report.status == 'Rejected' %}text-danger{% else %}text-warning{% endif %}">
+                                        {{ report.manual_status }}
+                                    </span>
+                                </h5>
+
+                           
+                                <div class="progress">
+                                    <div class="progress-bar {% if report.status == 'Completed' %}bg-success{% elif report.status == 'Rejected' %}bg-danger{% else %}bg-warning{% endif %}" role="progressbar" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <a href="#" class="btn btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">No reports filed yet.</div>
+            {% endfor %}
+
+            <!-- Back Button -->
+            <div class="text-center" style="margin-bottom: 120px;">
+                <a href="{% url 'app:index' %}" class="btn btn-primary">Back</a>  <!-- Change 'your_back_url' to your actual URL name -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+
+
+
+
+

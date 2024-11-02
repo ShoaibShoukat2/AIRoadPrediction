@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Admin Reports Management
+{% endblock title %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <!-- Large Title -->
+            <h1 class="display-4 mb-4">Riyadh Vision - Reports</h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Report Management Card -->
+            <div class="card">
+                <h5 class="card-header primary-color white-text text-center py-4">
+                    <strong>File Report</strong>
+                </h5>
+
+                <!-- Card body -->
+                <div class="card-body px-lg-5 pt-0 mt-5">
+                    <form class="text-center" style="color: #757575;" method="POST" action="{% url 'app:report-options' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Option to Upload File -->
+
+                        <div class="md-form mb-4">
+                            <label for="report-file" class="text-left">Upload Report File:</label>
+                            <input type="file" id="report-file" name="report_file" class="form-control" accept="image/*">
+                        </div>
+                    
+                        <p class="text-muted">OR</p>
+                    
+                        <!-- Option to Enter Location Text -->
+                        <div class="md-form mb-4">
+                            <label for="report-location" class="text-left">Enter Report Location:</label>
+                            <input type="text" id="report-location" name="report_location" class="form-control" placeholder="Enter location">
+                        </div>
+                    
+                        <!-- Submit Button -->
+                        <button class="btn btn-outline-primary btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">
+                            Submit Report
+                        </button>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+

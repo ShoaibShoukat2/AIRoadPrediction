@@ -1,0 +1,75 @@
+
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Admin Login
+{% endblock title %}
+
+{% block main_content %}
+<div class="container mt-5" style="margin-bottom: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <!-- Large Title -->
+            <h1 class="display-4 mb-4">Admin Panel - Login</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            {% if messages %}
+            <div class="alert alert-danger">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Login form card -->
+            <div class="card">
+                <h5 class="card-header primary-color white-text text-center py-4">
+                    <strong>Admin Login</strong>
+                </h5>
+
+                <!-- Card body -->
+                <div class="card-body px-lg-5 pt-0 mt-5">
+                    <!-- Form -->
+
+                    <form class="text-center" style="color: #757575;" method="POST" action="{% url 'app:adminlogin' %}">
+                        {% csrf_token %}
+                        <!-- Email -->
+                        <div class="md-form">
+                            <input type="email" id="email" name="email" class="form-control" required>
+                            <label for="email">Admin E-mail</label>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="md-form">
+                            <input type="password" id="password" name="password" class="form-control" required>
+                            <label for="password">Admin Password</label>
+                        </div>
+
+                        <!-- Login button -->
+                        <button class="btn btn-outline-primary btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">Login</button>
+
+                        <hr>
+
+                        <!-- Forgot password -->
+                        <p>
+                            <a href="">Forgot Admin Password?</a>
+                        </p>
+                    </form>
+                    <!-- Form -->
+                </div>
+            </div>
+            <!-- Login form card -->
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+
+
+
+

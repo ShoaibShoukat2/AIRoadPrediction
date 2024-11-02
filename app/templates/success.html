@@ -1,0 +1,19 @@
+<!-- success.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+Success - Report Uploaded
+{% endblock title %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <h2 class="text-success">Report submitted successfully!</h2>
+    <p>Your report has been uploaded. Thank you!</p>
+    <a href="{% url 'app:report-options' %}" class="btn btn-primary">Submit Another Report</a>
+    <a href="{% url 'app:report-status' %}" class="btn btn-secondary">View My Reports</a>
+</div>
+{% endblock main_content %}
+
+
+
+
