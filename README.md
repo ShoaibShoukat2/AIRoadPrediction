@@ -8,6 +8,9 @@ This project is a **Django-based web application** that uses AI to classify car 
 
 
 
+![Road Detection System](screencapture-127-0-0-1-8000-admin-reports-2024-11-04-21_05_56.png)
+
+
 
 
 ## 📌 Features
