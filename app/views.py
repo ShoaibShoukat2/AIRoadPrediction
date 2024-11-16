@@ -11,10 +11,11 @@ from tensorflow.keras.preprocessing import image as keras_image
 import numpy as np
 import tensorflow as tf
 from django.contrib.auth import logout
-
-
-
-
+from PIL import Image
+from torchvision import models, transforms
+import os
+import torch
+from django.conf import settings
 
 # Create your views here.
 
@@ -54,6 +55,7 @@ def signup(request):
 
     return render(request, 'signup.html')
 
+
 def user_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -74,31 +76,107 @@ def user_login(request):
     return render(request, 'login.html')
 
 
+
+# interview for em
+# Load the pre-trained Mask R-CNN model (from torchvision)
+model = models.detection.maskrcnn_resnet50_fpn(pretrained=True)
+model.eval()
+
+# Transformation for the input image
+transform = transforms.Compose([
+    transforms.ToTensor()
+])
+
+
+
+def check_car_on_road(image_path):
+    # Resolve the full image path using MEDIA_ROOT and ensure 'images' subdirectory is included
+    full_image_path = os.path.join(settings.MEDIA_ROOT, image_path)
+    
+    try:
+        # Open the image file and check if it exists
+        if not os.path.exists(full_image_path):
+            print(f"File not found at path: {full_image_path}")
+            return False
+        
+        # Open and process the image
+        image = Image.open(full_image_path).convert("RGB")
+        image_tensor = transform(image).unsqueeze(0)
+
+        with torch.no_grad():
+            prediction = model(image_tensor)
+
+        labels = prediction[0]['labels'].numpy()
+        boxes = prediction[0]['boxes'].detach().numpy()
+        scores = prediction[0]['scores'].detach().numpy()
+
+        car_on_road = False
+        for i in range(len(labels)):
+            if labels[i] == 3 and scores[i] > 0.5:
+                car_box = boxes[i]
+                _, car_y_min, _, car_y_max = car_box
+                road_region_y_min = image.height // 2
+
+                if car_y_max > road_region_y_min:
+                    car_on_road = True
+        return car_on_road
+
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return False
+    
+    
+    
+
+
 @login_required
 def Report_Options(request):
     if request.method == 'POST':
-        report_file = request.FILES.get('report_file')  
+        report_file = request.FILES.get('report_file')
         report_location = request.POST.get('report_location')
         
         if report_file:
-            # Save the report file temporarily
-            fs = FileSystemStorage()
+            # Save the uploaded file to the correct subdirectory within media
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'images'))
             filename = fs.save(report_file.name, report_file)
-            print(f"File '{filename}' uploaded successfully.")
+            file_path = os.path.join('images', filename)  # Save relative path for later use
+            print(f"File '{filename}' uploaded successfully at: {file_path}")
+
+            # Check if the car is on the road
+            is_car_on_road = check_car_on_road(file_path)
+            print(f"Car on road: {is_car_on_road}")
+            
+            # Set status based on AI analysis
+            status = 'accepted' if is_car_on_road else 'rejected'
+            
 
             # Save report info to the database
             report = Report.objects.create(
                 user=request.user,
-                file_image=report_file,  # Store the image in the ImageField
-                location=report_location
+                file_image=report_file,
+                location=report_location,
+                status=status
             )
-            print(f"Report created with ID: {report.id}, Location: {report_location}")
-
-            return redirect('app:success-page')  # Redirect to success page
+            
+            
+                        
+            print(f"Report created with ID: {report.id}, Location: {report_location}, Status: {report.status}")
+            
+            return redirect('app:success-page')
         else:
             print("No file uploaded.")
 
     return render(request, 'ReportOption.html')
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -127,8 +205,6 @@ def Report_Status(request):
 
 
 
-
-
 def Admin(request):
     context = {}  # Initialize context as an empty dictionary
 
@@ -145,9 +221,6 @@ def Admin(request):
     else:
         messages.error(request, "Access to this page is restricted to admins only.")
         return redirect('app:adminlogin')  # Redirect to the login page or another page
-
-
-
 
 
 
